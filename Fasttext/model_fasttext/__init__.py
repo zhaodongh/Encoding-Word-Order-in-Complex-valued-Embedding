@@ -1,1 +1,1 @@
-__all__ = ['PE_concat','PE_reduce','TPE_concat','TPE_reduce','Complex-vanilla','Complex-order']
+__all__ = ['PE_concat','PE_reduce','TPE_concat','TPE_reduce','Complex_vanilla','Complex_order']
