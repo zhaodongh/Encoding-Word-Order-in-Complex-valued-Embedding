@@ -5,7 +5,8 @@ import numpy as np
 import os
 import time
 import datetime
-from helper import batch_gen_with_point_wise, load, prepare, batch_gen_with_single,test_my
+from helper import load, prepare
+import helper
 import operator
 from model_fasttext import *
 from model_fasttext.Complex_order import Fasttext
@@ -23,8 +24,8 @@ print (timeStamp)
 from functools import wraps
 
 FLAGS = config.flags.FLAGS
-FLAGS._parse_flags()
-#FLAGS.flag_values_dict()
+# FLAGS._parse_flags()
+FLAGS.flag_values_dict()
 print("\nParameters:")
 for attr, value in sorted(FLAGS.__flags.items()):
     print(("{}={}".format(attr.upper(), value)))
@@ -35,7 +36,8 @@ data_file = log_dir + '/test_' + FLAGS.data + timeStamp
 para_file = log_dir + '/test_' + FLAGS.data + timeStamp + '_para'
 precision = data_file + 'precise'
 
-pickle.dump(FLAGS.__flags, open(para_file, 'wb+'))
+# pickle.dump(FLAGS.__flags, open(para_file, 'wb+'))
+
 
 def log_time_delta(func):
     @wraps(func)
@@ -50,10 +52,12 @@ def log_time_delta(func):
 #@log_time_delta
 def predict(sess, cnn, test, alphabet, batch_size, q_len, a_len):
     scores = []
-    for data in batch_gen_with_single(test, alphabet, batch_size, q_len, a_len):
+    for data in helper.batch_iter(test,batch_size,alphabet,sen_len = q_len):
+    # for data in batch_gen_with_single(test, alphabet, batch_size, q_len, a_len):
+        question,_,position = zip(*data)
         feed_dict = {
-            cnn.question: data[0],
-            cnn.q_position:data[1]
+            cnn.question: question,
+            cnn.q_position: position
         }
         score = sess.run(cnn.scores, feed_dict)
         scores.extend(score)
@@ -61,7 +65,7 @@ def predict(sess, cnn, test, alphabet, batch_size, q_len, a_len):
 
 @log_time_delta
 def test_point_wise():
-    train, dev, test = load(FLAGS.data, filter=FLAGS.clean)  #wiki
+    train, dev, test = load(FLAGS.data_dir)
     # train, test, dev = load(FLAGS.data, filter=FLAGS.clean) #trec
     q_max_sent_length = max(map(lambda x:len(x),train['question'].str.split()))
     a_max_sent_length=2
@@ -73,7 +77,7 @@ def test_point_wise():
     print ('dev length', len(dev))
 
     alphabet, embeddings,embeddings_complex = prepare(
-        [train, test, dev], max_sent_length=q_max_sent_length,dim=FLAGS.embedding_dim, is_embedding_needed=True, fresh=True)
+        [train, test, dev],dim=FLAGS.embedding_dim)
     print(embeddings_complex)
     print ('alphabet:', len(alphabet))
     with tf.Graph().as_default():
@@ -129,12 +133,14 @@ def test_point_wise():
             sess.run(tf.global_variables_initializer())
             map_max = 0.65
             for i in range(FLAGS.num_epochs):
-                datas = batch_gen_with_point_wise(train, alphabet, FLAGS.batch_size,q_len=q_max_sent_length, a_len=a_max_sent_length)
+                datas = helper.batch_iter(train,FLAGS.batch_size,alphabet,shuffle = True,sen_len = q_max_sent_length)
+                # datas = batch_gen_with_point_wise(train, alphabet, FLAGS.batch_size,q_len=q_max_sent_length, a_len=a_max_sent_length)
                 for data in datas:
+                    sentence,flag,position = zip(*data)
                     feed_dict = {
-                        cnn.question: data[0],
-                        cnn.input_y: data[1],
-                        cnn.q_position:data[2]
+                        cnn.question: sentence,
+                        cnn.input_y: flag,
+                        cnn.q_position:position
                     }
                     _, step, loss, accuracy, pred, scores,input_y,position= sess.run(
                         [train_op, global_step, cnn.loss, cnn.accuracy,cnn.predictions, cnn.scores,cnn.input_y,cnn.embedding_W_pos],feed_dict)

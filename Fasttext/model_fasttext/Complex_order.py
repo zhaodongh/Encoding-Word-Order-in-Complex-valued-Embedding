@@ -37,7 +37,6 @@ class Fasttext(object):
             self.total_embedding_dim = embedding_size
         if self.position_needed:
             self.total_embedding_dim = self.total_embedding_dim + extend_feature_dim
-        self.batch_size = batch_size
         self.l2_reg_lambda = l2_reg_lambda
         self.para = []
         self.max_input_left = max_input_left
@@ -47,11 +46,10 @@ class Fasttext(object):
         self.is_Embedding_Needed = is_Embedding_Needed
         self.rng = 23455
     def create_placeholder(self):
-        self.question = tf.placeholder(tf.int32,[self.batch_size,self.max_input_left],name = 'input_question')
-        self.input_y = tf.placeholder(tf.float32, [self.batch_size,2], name = "input_y")
-        self.q_position = tf.placeholder(tf.int32,[self.batch_size,self.max_input_left],name = 'q_position')
+        self.question = tf.placeholder(tf.int32,[None,self.max_input_left],name = 'input_question')
+        self.input_y = tf.placeholder(tf.float32, [None,2], name = "input_y")
+        self.q_position = tf.placeholder(tf.int32,[None,self.max_input_left],name = 'q_position')
     def Position_Embedding(self,position_size):
-        batch_size=self.batch_size
         seq_len = self.vocab_size
         position_j = 1. / tf.pow(10000., 2 * tf.range(position_size, dtype=tf.float32) / position_size)
         position_j = tf.expand_dims(position_j, 0)
