@@ -55,25 +55,25 @@ def precision_recall_f1(prediction, ground_truth):
     r = 1.0 * num_same / len(ground_truth)
     f1 = (2 * p * r) / (p + r)
     return p, r, f1
-def evaluationBypandas_f1_acc(df, predicted, predicted_label):
-	df["score"] = predicted
-	df['predicted_label'] = predicted_label
-	tp = 0
-	fp = 0
-	tn = 0
-	fn = 0
-	for i in range(len(df['score'])):
-		if df['predicted_label'][i] == df['flag'][i] and df['flag'][i] == 1:
-			tp = tp + 1
-		if df['predicted_label'][i] == df['flag'][i] and df['flag'][i] == 0:
-			tn = tn + 1
-		if df['predicted_label'][i] != df['flag'][i] and df['flag'][i] == 1:
-			fp = fp + 1
-		if df['predicted_label'][i] != df['flag'][i] and df['flag'][i] == 0:
-			fn = fn + 1
-	accuracy = (tp + tn) / (tp + fp + tn + fn)
-	accuracy1=accuracy_score(df["flag"],df['predicted_label'])
-	return accuracy, accuracy1
+def evaluationBypandas_f1_acc(df):
+	# df["score"] = predicted
+	# df['predicted_label'] = predicted_label
+	# tp = 0
+	# fp = 0
+	# tn = 0
+	# fn = 0
+	# for i in range(len(df['score'])):
+	# 	if df['predicted_label'][i] == df['flag'][i] and df['flag'][i] == 1:
+	# 		tp = tp + 1
+	# 	if df['predicted_label'][i] == df['flag'][i] and df['flag'][i] == 0:
+	# 		tn = tn + 1
+	# 	if df['predicted_label'][i] != df['flag'][i] and df['flag'][i] == 1:
+	# 		fp = fp + 1
+	# 	if df['predicted_label'][i] != df['flag'][i] and df['flag'][i] == 0:
+	# 		fn = fn + 1
+	# accuracy = (tp + tn) / (tp + fp + tn + fn)
+	accuracy1 = accuracy_score(df["flag"],df['predicted_label'])
+	return accuracy1
 
 def eval(predicted,groundtruth=qa_path, file_flag=False):
 	if  'Windows' in platform.system() and file_flag ==False:

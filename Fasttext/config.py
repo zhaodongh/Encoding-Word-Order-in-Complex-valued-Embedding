@@ -23,7 +23,7 @@ flags.DEFINE_integer("batch_size", 120, "Batch Size (default: 64)")
 flags.DEFINE_boolean(
     "trainable", True, "is embedding trainable? (default: False)")
 flags.DEFINE_integer(
-    "num_epochs", 1, "Number of training epochs (default: 200)")
+    "num_epochs", 5, "Number of training epochs (default: 200)")
 flags.DEFINE_integer("evaluate_every", 500,
                      "Evaluate model on dev set after this many steps (default: 100)")
 flags.DEFINE_integer("checkpoint_every", 500,
@@ -31,7 +31,7 @@ flags.DEFINE_integer("checkpoint_every", 500,
 flags.DEFINE_boolean('overlap_needed', False, "is overlap used")
 flags.DEFINE_boolean('position_needed', False, 'is position used')
 flags.DEFINE_boolean('dns', 'False', 'whether use dns or not')
-flags.DEFINE_string('data_dir', '../data/mr', 'data set')
+flags.DEFINE_string('data_dir', 'data/mr', 'data set')
 flags.DEFINE_string('data', 'mr', 'data set')
 flags.DEFINE_string('CNN_type', 'qacnn', 'data set')
 flags.DEFINE_float('sample_train', 1, 'sampe my train data')
